@@ -7,18 +7,26 @@ table tr, td {
 	height: 30px;
 	cursor: pointer;
 	text-align: center;
+	box-shadow: 1px 1px 1px gray;
 }
 
-table td:hover{
+/*table td:hover{
 	width: 28px;
 	height: 28px;
 	border: solid blue 1px;
 	background-color: aliceblue;
+}*/
+
+.over{
+	background-color: #ffad99;
+	color: red;
+	font-weight: bold;
 }
 
 .mine {
 	background-image: url('images/bomb.png');
 	background-size:cover;
+	background-color: #ffad99;
     width:20px;
     height:20px;
 }
