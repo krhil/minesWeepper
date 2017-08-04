@@ -203,21 +203,18 @@ window.onload = function(){
 		}else{
 
 			var perimeter = targetBox.perimeter;
-			console.log(targetBox);
-			console.log(perimeter.length +"===>perimeter length");
-			for(var i = 0; i< targetBox.perimeter.length; i++){
-				console.log(perimeter[i] == undefined ? "HERE: "+i:"");
-				pRow = targetBox.perimeter[i].row;
-				pCol = targetBox.perimeter[i].col;
+			for(var i = 0; i< perimeter.length; i++){
+				pRow = perimeter[i].row;
+				pCol = perimeter[i].col;
 
 				cell = boardTable.rows[pRow].cells[pCol];
-				cell.innerHTML = targetBox.perimeter[i].value >0 ? targetBox.perimeter[i].value : "";
+				cell.innerHTML = perimeter[i].value >0 ? perimeter[i].value : "";
 				cell.className = "safe";
 				cell.setAttribute("disabled",true);
-				if(targetBox.perimeter[i].value != 0){
-					 targetBox.perimeter[i].enable = false;
+				if(perimeter[i].value != 0){
+					 perimeter[i].enable = false;
 				}
-				if(targetBox.perimeter[i].value == 0 && targetBox.perimeter[i].enable){
+				if(perimeter[i].value == 0 && perimeter[i].enable){
 					getSafeBoxes(pRow, pCol);
 				}
 			}
