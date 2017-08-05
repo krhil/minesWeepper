@@ -1,715 +1,349 @@
 window.onload = function(){
+	var boardTable  = document.getElementById("board");
+	var inputLevel  = document.getElementById("level");
+	var inputMines  = document.getElementById("mines");
+	var btnStart    = document.getElementById("btnStart");	
+
 	
-	var boardTable = document.getElementById("board");
-	var btnRestart = document.getElementById("btnRestart");
-
-	btnRestart.addEventListener("click", function(){
-		boardTable.innerHTML = "";
-		game = new Game("Intermediate");
-	});
-
-	function Box(row, col, value){
-
-		this.row = row;
-		this.col = col;
-		this.value = value;
-	}
-
-	function Level(name = "Beginner"){
-		this.name = name; //typeof name == 'undefined' ? "Beginner" : name;
-		if(this.name == "Beginner"){
-			this.board = {
-				rows: 7,
-				cols: 7
-			},
-			this.mines = 10;
-		}else if(this.name == "Intermediate"){
-			this.board = {
-				rows: 15,
-				cols: 15
-			},
-			this.mines = 40;
-		}else{
-			this.board = {
-				rows: 15,
-				cols: 29
-			},
-			this.mines = 99;
+	Level = function(value){
+		switch(value) {
+			case "1":
+				this.name = "Beginner";
+				this.rows= 7;
+				this.cols= 7;		
+				this.mines = 10;
+				break
+			case "2":
+				this.name = "Intermediate";
+				this.rows= 15;
+				this.cols= 15;
+				this.mines = 40;
+				break
+			case "3":
+				this.name = "Expert";
+				this.rows= 29;
+				this.cols= 15;
+				this.mines = 99;
+				break					
 		}
 	}
-
-	function Game(level){
-		this.level = new Level(level);
-		this.boardElements = new Array();
+	
+	Board = function(level){
+		this.level = new Level(level);	
 		this.boxes = new Array();
-		this.buildBoard();
-		this.setMines();
-		//this.setNumbers();
-	};
-    
-    Game.prototype.buildBoard = function(){
-    	for(var r = 0; r <= this.level.board.rows; r++ ){
-			var row = boardTable.insertRow(r);
-			this.boardElements[r] = new Array();
-			row.setAttribute('id', r);
-			
-
-			for(var c = 0; c <= this.level.board.cols ; c++){
-				this.boardElements[r][c] = 0;
-				var col = row.insertCell(c);
-				col.addEventListener("click", function(){
-					clickEvent(this);
-				})
-				col.addEventListener("contextmenu", function(ev){
-					console.log(ev);	
-					rightClickEvent(this, ev);
-					return false;
-				}, false)
-				col.setAttribute('id',c);
-				//col.innerHTML = r +"."+ c;
-			}
-		}
-    }	
-
-	Game.prototype.getPerimeter = function(row, col){
-		var perimeter = new Array();
-		if(row == 0){
-			if(col == 0){
-				perimeter.push(new Box(row+1, col,this.boardElements[row+1][col]));
-				perimeter.push(new Box(row+1, col+1, this.boardElements[row+1][col+1]));
-				perimeter.push(new Box(row, col+1, this.boardElements[row][col+1]));
-			}else if(col == this.level.board.cols){
-				perimeter.push(new Box(row, col-1,this.boardElements[row][col]));
-				perimeter.push(new Box(row+1, col-1,this.boardElements[row+1][col-1]));
-				perimeter.push(new Box(row+1, col,this.boardElements[row+1][col]));		
-			}else{
-				perimeter.push(new Box(row, col-1, this.boardElements[row][col-1]));
-				var i = row+1;
-				var j = col-1;
-				while(j<=col+1){
-					perimeter.push(new Box(i, j,this.boardElements[i][j]));
-					j++;
-				}
-				perimeter.push(new Box(row, col + 1,this.boardElements[row][col+1]));
-			}
-		}else if(row == this.level.board.rows){
-			if(col == 0){
-				perimeter.push(new Box(row-1, col, this.boardElements[row-1][col]));
-				perimeter.push(new Box(row-1, col+1, this.boardElements[row-1][col+1]));
-				perimeter.push(new Box(row, col+1, this.boardElements[row][col+1]));
-			}else if(col == this.level.board.cols){
-				perimeter.push(new Box(row, col-1, this.boardElements[row][col-1]));
-				perimeter.push(new Box(row-1, col-1, this.boardElements[row-1][col-1]));
-				perimeter.push(new Box(row-1, col, this.boardElements[row-1][col]));			
-			}else{
-				perimeter.push(new Box(row, col-1, this.boardElements[row][col-1]));
-				perimeter.push(new Box(row, col+1, this.boardElements[row][col+1]));
-				var i = row-1;
-				var j = col-1;
-				while(j<=col+1){
-					perimeter.push(new Box(i, j, this.boardElements[i][j]));
-					j++;
-				}
-			}
-		}else{
-			if(col == 0){
-				perimeter.push(new Box(row-1, col, this.boardElements[row-1][col]));
-				var i = row-1;
-				var j = col+1;
-				while(i<=row+1){
-					perimeter.push(new Box(i, j, this.boardElements[i][j]));
-					i++;
-				}		
-				perimeter.push(new Box(row+1, col, this.boardElements[row+1][col]));	
-			}else if(col == this.level.board.cols){
-				perimeter.push(new Box(row-1, col, this.boardElements[row-1][col]));	
-				var i = row-1;
-				var j = col-1;
-				while(i<=row+1){
-					perimeter.push(new Box(i, j, this.boardElements[i][j]));
-					i++;
-				}				
-				perimeter.push(new Box(row+1, col, this.boardElements[row+1][col]));
-			}else{
-				var i = row-1;
-				var j = col-1;
-				while(i<=row+1){
-					perimeter.push(new Box(i, j, this.boardElements[i][j]));
-					i++;
-				}
-				perimeter.push(new Box(row+1, col, this.boardElements[row+1][col]));
-			    i = row+1;
-			    j = col+1;
-				while(i>=row-1){
-					perimeter.push(new Box(i, j, this.boardElements[i][j]));
-					i--;
-				}
-				perimeter.push(new Box(row-1, col, this.boardElements[row-1][col]));
-			}
-		}
-		
-		// for (var i = 0; i < perimeter.length; i++) {
-		// 	console.log(perimeter[i]);
-		// }
-		return perimeter;
+		this.build();
 	}
-
-    Game.prototype.setMines = function() {
-    	var minesRemaining = this.level.mines;
-    	while(minesRemaining > 0){
-    		var x = Math.floor((Math.random() * this.level.board.rows));	
-    		var y = Math.floor((Math.random() * this.level.board.cols));
-
-    		var cell = boardTable.rows[x].cells[y];
-    		
-    		if(this.boardElements[x][y] != -1){
-    			this.boardElements[x][y] = -1;
-    			minesRemaining -= 1;
-    		}
-    	}
-    }
-
-    Game.prototype.getMines = function(){
-    	console.log("Bombs \n");
-    	for (var i = 0; i < this.level.board.rows; i++) {
-    		for (var j = 0; j < this.level.board.cols; j++) {
-    			if(this.boardElements[i][j] == -1){
-    				console.log(i + "," + j + "=> " + this.boardElements[i][j]);
-    			}
-    		}
-    	}
-    }
-
-    Game.prototype.getMinesAround = function(row, col){
-    	var minesAround = 0;
-
-    		if(row == this.boardElements.length -1){
-    			var fromRow;
-		    	var toCol;
-
-    			if(col == 0){
-    				fromRow = row - 1;
-    			    toCol = col + 1;
-		    		for (var i = fromRow; i <=row; i++) {
-		    			for (var j = col; j <= toCol; j++) {
-		    				minesAround += this.boardElements[i][j] == -1 ? 1 : 0;
-		    			}
-		    		}
-		    	}else if(col == this.boardElements[0].length){
-    				fromRow = row - 1;
-    			    var fromCol = col - 1;
-		    		for (var i = fromRow; i <=row; i++) {
-		    			for (var j = fromCol; j <= col; j++) {
-		    				minesAround += this.boardElements[i][j] == -1 ? 1 : 0;
-		    			}
-		    		}
-		    	}else{
-		    		fromRow = row - 1;
-		    		var fromCol = col - 1;
-		    		for (var i = fromRow; i <= row; i++) {
-		    			for (j = fromCol; j <= col; j++) {
-		    				minesAround += this.boardElements[i][j] == -1 ? 1 : 0;
-		    			}
-		    		}	    		
-		    	}
-    		}else if(row == 0){
-	    		if(col == 0){
-		    		for (var k = 0; k <=1; k++) {
-		    			for (var l = 0; l <= 1; l++) {
-		    				minesAround += this.boardElements[k][l] == -1 ? 1 : 0;
-		    			}
-		    		}
-		    	}else{
-		    		var from = col - 1;
-		    		var to = col + 1;
-		    		
-		    		for (var i = 0; i <=1; i++) {
-		    			for (j = from; j <= to; j++) {
-		    				minesAround += this.boardElements[i][j] == -1 ? 1 : 0;
-		    			}
-		    		}	    		
-		    	}
-	    	}else{
-	    		var fromRow = row - 1;
-	    		var toRow = row + 1;
-	    		var fromCol = col - 1;
-	    		var toCol = col + 1;
-	    		
-	    		for (var i = fromRow; i <= toRow; i++) {
-	    			for (j = fromCol; j <= toCol; j++) {
-	    				minesAround += this.boardElements[i][j] == -1 ? 1 : 0;
-	    			}
-	    		}	 
-	    	}
-	    
-	    //console.log(row+","+ col + "->" + "mines=" + minesAround);
-    	return minesAround;
-    }
-
-    Game.prototype.setNumbers = function(){
-    	for (var i = 0; i <= this.level.board.rows; i++) {
-    		for (var j = 0; j <= this.level.board.cols; j++) {
-    			if(this.boardElements[i][j] != -1){
-    				var value = this.getMinesAround(i,j);
-    				this.boardElements[i][j] = value;//this.getMinesAround(i,j);
-    				//boardTable.rows[i].cells[j].innerHTML = value;
-    			}
-    		}
-    	}
-    }
-
-
-    Game.prototype.setSafesAround = function(row, col){
-    	var minesAround = 0;
-
-    		if(row == this.boardElements.length -1){
-    			var fromRow;
-		    	var toCol;
-		    	var content = this.boardElements[row][col];
-    			var cell = boardTable.rows[row].cells[col];
-    			if(col == 0){
-    				fromRow = row - 1;
-    			    toCol = col + 1;
-		    		for (var i = fromRow; i <=row; i++) {
-		    			for (var j = col; j <= toCol; j++) {
-		    				content = this.boardElements[i][j];
-		    				cell = boardTable.rows[i].cells[j];
-		    				if(content != -1){
-		    					cell.className = "safe";
-		    					cell.innerHTML = content ==  0 ? " " : content;
-		    				}
-		    			}
-		    		}
-		    	}else if(col == this.boardElements[0].length){
-    				fromRow = row - 1;
-    			    var fromCol = col - 1;
-		    		for (var i = fromRow; i <=row; i++) {
-		    			for (var j = fromCol; j <= col; j++) {
-		    				content = this.boardElements[i][j];
-		    				cell = boardTable.rows[i].cells[j];	
-		    				if(content != -1){
-		    					cell.className = "safe";
-		    					cell.innerHTML = content ==  0 ? " " : content;
-		    				}		    					    				
-		    			}
-		    		}
-		    	}else{
-		    		fromRow = row - 1;
-		    		var fromCol = col - 1;
-		    		for (var i = fromRow; i <= row; i++) {
-		    			for (j = fromCol; j <= col; j++) {
-		    				content = this.boardElements[i][j];
-		    				cell = boardTable.rows[i].cells[j];	
-		    				if(content != -1){
-		    					cell.className = "safe";
-		    					cell.innerHTML = content ==  0 ? " " : content;
-		    				}
-		    			}
-		    		}	    		
-		    	}
-    		}else if(row == 0){
-	    		if(col == 0){
-		    		for (var k = 0; k <=1; k++) {
-		    			for (var l = 0; l <= 1; l++) {
-		    				content = this.boardElements[i][j];
-		    				cell = boardTable.rows[i].cells[j];	
-		    				if(content != -1){
-		    					cell.className = "safe";
-		    					cell.innerHTML = content ==  0 ? " " : content;
-		    				}
-		    			}
-		    		}
-		    	}else{
-		    		var from = col - 1;
-		    		var to = col + 1;
-		    		
-		    		for (var i = 0; i <=1; i++) {
-		    			for (j = from; j <= to; j++) {
-		    				content = this.boardElements[i][j];
-		    				cell = boardTable.rows[i].cells[j];	
-		    				if(content != -1){
-		    					cell.className = "safe";
-		    					cell.innerHTML = content ==  0 ? " " : content;
-		    				}
-		    			}
-		    		}	    		
-		    	}
-	    	}else{
-	    		var fromRow = row > 0 ? row - 1 : row;
-	    		var toRow = row < this.level.board.rows ? row + 1 : row;
-	    		var fromCol = col > 0 ? col - 1 : col ;
-	    		var toCol = col < this.level.board.rows ? col+1 : col;
-	    		console.log(row +","+ col);
-	    		for (var i = fromRow; i <= toRow; i++) {
-	    			for (j = fromCol; j <= toCol; j++) {
-	    				content = this.boardElements[i][j];
-	    				cell = boardTable.rows[i].cells[j];	
-	    				if(content != -1){
-	    					cell.className = "safe";
-	    					cell.innerHTML = content ==  0 ? " " : content;
-	    				}
-	    			}
-	    		}	 
-	    	}
-    }
-
-
-    Game.prototype.showSafesSquares = function(row, col){
-    	var content = this.boardElements[row][col];
-    	var cell = boardTable.rows[row].cells[col];
-    	if(content == 0){  		
-    		//if(row == 0){
-
-				var i = row;
-				var j = col;
-				if(i > 0){
-					while(i <= this.level.board.rows){
-					    cell = boardTable.rows[i].cells[col];
-					    content = this.boardElements[i][col];
-						if(content != -1){
-							/*cell.className = "safe";
-							cell.innerHTML = content ==  0 ? " " : content;*/
-							if(content != 0){
-								cell.className = "safe";
-								break;
-							}
-							this.setSafesAround(i,col);
-						}
-						i++;					
-					}
-
-					i = row;
-					
-						while(i > 0){
-							cell = boardTable.rows[i].cells[col];
-					   		content = this.boardElements[i][col];
-							if(content != -1){
-								/*cell.className = "safe";
-								cell.innerHTML = content ==  0 ? " " : content;*/
-								if(content != 0){
-									cell.className = "safe";
-									break;
-								}
-							}
-							this.setSafesAround(i,col);
-							i--;					
-						}
-				}
-
-				if(j > 0){
-					while(j <= this.level.board.cols){
-					    cell = boardTable.rows[row].cells[j];
-					    content = this.boardElements[row][j];
-						if(content != -1){
-							/*cell.className = "safe";
-							cell.innerHTML = content ==  0 ? " " : content;*/
-							if(content != 0){
-								cell.className = "safe";
-								break;
-							}
-						}
-						this.setSafesAround(row,j);	
-						j++;
-					}				    		
-    		
-					j = col;
-					
-					while(j > 0){
-						cell = boardTable.rows[row].cells[j];
-				   		content = this.boardElements[row][j];
-						if(content != -1){
-							/*cell.className = "safe";
-							cell.innerHTML = content ==  0 ? " " : content;*/
-							if(content != 0){
-							    cell.className = "safe";
-								break;
-							}
-						}
-						this.setSafesAround(row,j);
-						j--;					
-					}
-				}
-    		//}
-    	}else{
-			cell.className = "safe";
-			//cell.innerHTML = content;
-    	}
-    }
-
-    Game.prototype.setValue = function(row, col){
-		if(this.boardElements[row][col] != -1){
-			perimeter = game.getPerimeter(row,col);
-			var mines = 0;
-			for (var k = 0; k < perimeter.length; k++) {
-			 	mines += perimeter[k].value == -1 ? 1: 0;
-			 }
-			 this.boardElements[row][col] = mines;
-		}
-	}
-
-	Game.prototype.showSafePerimeter = function(row, col){
-		perimeter = game.getPerimeter(row,col);
-		for (var k = 0; k < perimeter.length; k++) {
-			var pRow = perimeter[k].row;
-			var pCol = perimeter[k].col;
-			valueJ = perimeter[k].value;
-		 	if(valueJ != -1){
-		 		boardTable.rows[pRow].cells[pCol].className = "safe";
-				boardTable.rows[pRow].cells[pCol].innerHTML = valueJ > 0 ? valueJ : "";
-		 	}
-		 }
-	}
-
-	Game.prototype.verticalScanner = function(row, j, find="number"){
-		alert(find);
-		var finalRow;
-		for(var i = row; i>=0; i--){
-			var valueJ = this.boardElements[i][j];		
-			
-			boardTable.rows[i].cells[j].className = "safe";
-			boardTable.rows[i].cells[j].innerHTML = valueJ > 0 ? valueJ: "";		
-			
-			if(find == "number"){
-				if(valueJ >0){
-				   boardTable.rows[i].cells[j].className = "safe";
-				   boardTable.rows[i].cells[j].innerHTML = valueJ 
-					break;
-				}			
-			}else{
-				alert("Here!");
-				if(valueJ == -1){
-				   boardTable.rows[i].cells[j].className = "safe";
-				   boardTable.rows[i].cells[j].innerHTML = valueJ 
-					break;
-				}						
-			}			
+	
+	Board.prototype.build = function(){	
+		for(var i=0; i<=this.level.rows ; i++){
+			this.boxes.push([]);
+			for(var j=0; j<=this.level.cols ; j++){
+				this.boxes[i][j]={row:i,col:j,value:0,perimeter: [], enable: true};
+			}
 		}	
-		for(var i = row; i<=this.level.board.rows; i++){
-			var valueJ = this.boardElements[i][j];						
-
-			if(find == "number"){
-				boardTable.rows[i].cells[j].className = "safe";
-				boardTable.rows[i].cells[j].innerHTML = valueJ > 0 ? valueJ: "";					
-				if(valueJ >0){
-				   boardTable.rows[i].cells[j].className = "safe";
-				   boardTable.rows[i].cells[j].innerHTML = valueJ 
-					break;
-				}			
-			}else{
-				if(valueJ == -1){ 
-					break;
-				}						
+		
+		this.setMines();
+		
+		for(var k=0; k<=this.level.rows ; k++){
+			for(var l=0; l<=this.level.cols; l++){
+				this.setValues(k,l);
 			}
 		}
 	}
-
-	Game.prototype.getSafesSquares = function(row, col){
-
-		var value = this.boardElements[row][col];
-
-		if(value > 0){
-			boardTable.rows[row].cells[col].className = "safe";
-			boardTable.rows[row].cells[col].innerHTML = value;
-		}else if(value == 0){
-			for(var j = col; j>=0 ; j--){
-				alert("column: " + j);
-				var finalUpRow;
-				var finalDownRow;
-				var value = this.boardElements[row][j];
-				if(value !=0){
-					alert(finalUpRow);
-					for(var k = row; k >= finalUpRow; k--){
-						valueJ = this.boardElements[k][j];
-						boardTable.rows[k].cells[j].className = "safe";
-						boardTable.rows[k].cells[j].innerHTML = valueJ >0 ? valueJ: "";
-					}
-					for(var k = row; k <= finalDownRow; k++){
-						valueJ = this.boardElements[k][j];
-						boardTable.rows[k].cells[j].className = "safe";
-						boardTable.rows[k].cells[j].innerHTML = valueJ >0 ? valueJ: "";
-					}					
-					break;
-				}				
-					for(var i = row; i>=0; i--){
-						alert("row: " + i);
-						var valueJ = this.boardElements[i][j];		
-						
-						boardTable.rows[i].cells[j].className = "safe";
-						boardTable.rows[i].cells[j].innerHTML = valueJ > 0 ? valueJ: "";		
-						finalUpRow = i;
-						if(valueJ >0){
-							boardTable.rows[i].cells[j].className = "safe";
-						   boardTable.rows[i].cells[j].innerHTML = valueJ 
-							break;
-						}					
-							
-					}	
-
-					for(var i = row; i<=this.level.board.rows; i++){
-						var valueJ = this.boardElements[i][j];
-
-						boardTable.rows[i].cells[j].className = "safe";
-						boardTable.rows[i].cells[j].innerHTML = valueJ > 0 ? valueJ: "";
-						finalDownRow = i;							
-						if(valueJ >0){		
-							boardTable.rows[i].cells[j].className = "safe";
-						   boardTable.rows[i].cells[j].innerHTML = valueJ 																		
-							break;
-						}	
-					}
-
+	
+	Board.prototype.setMines = function(){
+		var minesRemaining = this.level.mines;
+		while(minesRemaining>0){
+			var row = Math.floor((Math.random() * this.level.rows));
+			var col = Math.floor((Math.random() * this.level.cols));
+			var value = this.boxes[row][col].value;			
+			if(value !=-1){
+				this.boxes[row][col].value = -1;
+				minesRemaining-=1;
 			}
-
-		/*	for(var j = col; j<=this.level.board.cols ; j++){
-				var value = this.boardElements[row][j];
-					for(var i = row; i>=0; i--){
-						var valueJ = this.boardElements[i][j];		
-
-						boardTable.rows[i].cells[j].className = "safe";
-						boardTable.rows[i].cells[j].innerHTML = valueJ > 0 ? valueJ: "";		
-						if(valueJ !=0){
-							boardTable.rows[i].cells[j].className = "safe";
-						   boardTable.rows[i].cells[j].innerHTML = valueJ 			
-							break;
-						}						
-					}	
-					for(var i = row; i<=this.level.board.rows; i++){
-						var valueJ = this.boardElements[i][j];
-						
-						boardTable.rows[i].cells[j].className = "safe";
-						boardTable.rows[i].cells[j].innerHTML = valueJ > 0 ? valueJ: "";							
-						if(valueJ !=0){		
-							boardTable.rows[i].cells[j].className = "safe";
-						   boardTable.rows[i].cells[j].innerHTML = valueJ 																		
-							break;
-						}	
-					}
-
-					if(value !=0){	
-						break;
-					}
-
-			}			*/
-		}
+		}		
 	}
-
-
-	Game.prototype.other = function(row, col){
-		var value = this.boardElements[row][col];
-
-		if(value > 0){
-			boardTable.rows[row].cells[col].className = "safe";
-			boardTable.rows[row].cells[col].innerHTML = value;
-		}else if(value == 0){
-			var j = col;
-
-			while(j>=0){
-					leftValue = this.boardElements[row][j-2];
-					boardTable.rows[row].cells[j].className = "safe";
-					this.showSafePerimeter(row,j);	
-					alert(leftValue);
-					if(leftValue !=0){
-						//this.showSafePerimeter(row,j-2);
-						alert("Break loop!");
-						break;
-					}				
+	
+	Board.prototype.setValues = function(row, col){
+		var boxTarget = this.boxes[row][col];
+		if(boxTarget.value !== -1){ 
+			var rowFrom;
+			var rowTo;
+			var colFrom;
+			var colTo;		
 			
-					/*var i = row;
-					while(i>=0){
-						var valueJ = this.boardElements[i][j];
-						if(i-3 < 0){
-							this.showSafePerimeter(0,j);
-							break;
-						}
-						this.showSafePerimeter(i,j);	
-						i-=3;
-						if(valueJ !=0){
-							break;
-						}						
-					}	*/
-					/*while(i<= this.level.board.rows){
-					if(i+3 > this.level.board.rows){
-						this.showSafePerimeter(this.level.board.rows,j);
-						break;
-					}
-						this.showSafePerimeter(i,j);	
-						i+=3;
-						if(valueJ !=0){
-							break;
-						}						
-					}*/
-				j-=3;
+			if(row == 0){
+				rowFrom = row;
+				rowTo = row+1;
+			}else if(row == this.level.rows)	{ 
+				rowFrom = row-1;
+				rowTo = row;
+			}else{
+				rowFrom = row-1;
+				rowTo = row+1;			
+			}
+			
+			if(col == 0){
+			    colFrom = col;
+				colTo = col+1;				
+			}else if(col == this.level.cols){
+			    colFrom = col-1;
+				colTo = col;				
+			}else{
+			    colFrom = col-1;
+				colTo = col+1;				
 			}
 
-			/*while(j<=this.level.board.cols){
-				var i = row;
-				while(i>=0){
-					if(i-3 < 0){
-						this.showSafePerimeter(0,j);
-						break;
-						}
-					this.showSafePerimeter(i,j);	
-					i-=3;
-					if(valueJ !=0){
-						break;
-					}						
-				}	
-				while(i<= this.level.board.rows){
-					if(i+3 > this.level.board.rows){
-						this.showSafePerimeter(this.level.board.rows,j);
-						break;
+
+			for(var i=rowFrom; i<=rowTo; i++){
+				for(var j=colFrom; j<=colTo; j++){
+					var box = this.boxes[i][j];
+					if(box != boxTarget){
+						boxTarget.perimeter.push(box);
 					}
-					this.showSafePerimeter(i,j);	
-					i+=3;
-					if(valueJ !=0){
-						break;
-					}						
-				}
-
-				if(value !=0){	
-					break;
-				}
-
-				j+=3;
-			}*/
+					if(box.value==-1){
+						boxTarget.value+=1;
+					}
+				}		
+			}
 		}
+	}
+	
+	Board.prototype.getAll = function(){
+		return this.boxes;
+	}
+
+	Board.prototype.getAllByValue = function(value){
+		result = new Array();
+
+		for(var i=0;i<this.boxes.length;i++){
+			for(var j=0;j<this.boxes[i].length;j++){
+				
+				if(this.boxes[i][j].value == value){
+					result.push(this.boxes[i][j]);
+				}
+			}
+		}
+		return result;
+	}
+	
+	Board.prototype.get = function(row, col){
+		return this.boxes[row][col];
+	}
+	
+	Game = function(level){
+		this.board = new Board(level);
+		this.showHelp = false;	
+		this.movesRemaining = this.getTotalSafBoxes();
+		this.activeMines = this.board.level.mines;
+		this.buildBoard();	
+	}
+	
+	Game.prototype.buildBoard = function(){
+		var boxes = this.board.getAll();
+		var showHelp = this.showHelp;
+
+		for(var i =0; i<boxes.length ; i++){
+			var row = boardTable.insertRow(i);
+			row.setAttribute("id",i);
+			for(var j =0; j<boxes[i].length ; j++){
+				var box = boxes[i][j];
+				var cell = row.insertCell(j);
+				cell.setAttribute("id",j);
+
+				//cell.innerHTML = box.value > 0 ? box.value:"" ;
+				/*if(box.value == -1){
+					cell.className = "mine";
+				}*/
+
+				cell.addEventListener("click", function(){
+					selectBox(this);
+				});		
+				cell.addEventListener("contextmenu", function(e){
+					e.preventDefault();
+					setFlag(this);
+				},false);
+
+				cell.addEventListener("mouseover", function(){
+					scanPerimeter(this);
+				});
+				cell.addEventListener("mouseout", function(){
+					hidePerimeter(this);
+				});		
+			}
+		}
+	}
+	
+	Game.prototype.getTotalSafBoxes = function(){
+		var totalBoxes = (this.board.level.rows+1) * (this.board.level.cols+1);
+		totalBoxes-= this.board.level.mines;
+		totalBoxes-= this.board.getAllByValue(0).length;
+		return totalBoxes;
+	}
+
+	Game.prototype.getSafeBoxes = function(row, col){
+		var targetBox = this.board.get(row,col);
+		targetBox.enable = false;
+
+		if(targetBox.value !=0){
+			boardTable.rows[pRow].cells[pCol].innerHTML = targetBox.value;
+			boardTable.rows[pRow].cells[pCol].className = "safe";
+			this.movesRemaining-=1;
+		}else{
+			var perimeter = targetBox.perimeter;
+			for(var i = 0; i< perimeter.length; i++){
+				pRow = perimeter[i].row;
+				pCol = perimeter[i].col;
+
+				cell = boardTable.rows[pRow].cells[pCol];
+				cell.innerHTML = perimeter[i].value >0 ? perimeter[i].value : "";
+				cell.className = "safe";
+				cell.setAttribute("disabled",true);
+				
+				if(perimeter[i].value != 0){
+					 if(perimeter[i].enable){
+					 	this.movesRemaining-=1;
+					 }
+					 perimeter[i].enable = false;
+				}
+				if(perimeter[i].value == 0 && perimeter[i].enable){
+					this.getSafeBoxes(pRow, pCol);
+				}
+			}
+		}
+	}
+
+	Game.prototype.showAllBoxes = function(){
+		var boxes = this.board.getAll();
+		
+		for(var i = 0; i < boxes.length; i++) {
+			for(var j = 0; j < boxes[i].length; j++) {
+				var box = this.board.get(i,j);
+				var cell = boardTable.rows[i].cells[j];
+
+				box.enable = false;
+				if(box.value != -1){
+					cell.className = "over"; 
+					cell.innerHTML = box.value > 0 ? box.value : "";
+				}else{
+					cell.className = "mine";
+				}
+			}
+		}
+	}
+
+	Game.prototype.showAllMines = function(){
+		var mines = this.board.getAllByValue(-1);
+		
+		for (var i = 0; i < mines.length; i++) {
+			var mRow = mines[i].row;
+			var mCol = mines[i].col;
+			boardTable.rows[mRow].cells[mCol].className = "mine"; 	
+		}
+	}
+
+	var game;
+	
+	function selectBox(cell){
+		var row = cell.parentElement.rowIndex;
+		var col = cell.getAttribute("id");
+		var boxTarget = game.board.get(row,col);
+
+		if(cell.className == "flag"){
+			return;
+		}
+		if(boxTarget.enable){
+			switch(boxTarget.value){
+				case -1: 
+					game.showAllBoxes();
+					cell.className = "boom";
+					alert("Boom!!! You lose");
+				break;
+				case 0: 	
+					game.getSafeBoxes(row, col);
+				break;
+				default:
+					boxTarget.enable = false;
+					cell.className = "safe";			
+					cell.innerHTML = boxTarget.value;	
+					game.movesRemaining-=1;
+				break;
+			}
+			if(game.movesRemaining==0){
+				alert("you win this time!");
+			}
+		}
+	}
+	
+	function setFlag(cell){
+		var row = cell.parentElement.rowIndex;
+		var col = cell.getAttribute("id");
+		var boxTarget = game.board.get(row,col);
+		var minesRemaining = parseInt(inputMines.value);
+
+			if(boxTarget.enable){
+				if(cell.className != "flag"){
+					if(boxTarget.value==-1){
+						game.activeMines-=1;
+						if(game.activeMines==0){
+							alert("you win this time!");
+						}
+					}
+					if(minesRemaining>0){
+						cell.className = "flag";
+						inputMines.value = minesRemaining -1
+					}
+				}else{
+					if(boxTarget.value==-1){
+						game.activeMines+=1;
+					}
+					cell.className = "";
+					inputMines.value = minesRemaining +=1;
+
+				}
+			}		
+	}
+
+	function scanPerimeter(cell){
+		if(game.showHelp){
+			var row = cell.parentElement.rowIndex;
+			var col = cell.getAttribute("id");
+			var targetBox = game.board.get(row,col);
+			var perimeter = targetBox.perimeter;
+			var color = targetBox.value == -1 ? "#ffcccc" : "#b1c9ef";
+			cell.setAttribute("bgcolor",color);
+
+				for(var i = 0; i< perimeter.length; i++){
+					pRow = perimeter[i].row;
+					pCol = perimeter[i].col;
+					cell = boardTable.rows[pRow].cells[pCol];
+					color = game.board.get(pRow, pCol).value == -1 ? "#ffcccc" : "#b1c9ef";
+	 				cell.setAttribute("bgColor", color);
+				}	
+		}	
+	}
+	
+	function hidePerimeter(cell){
+		if(game.showHelp){
+			var row = cell.parentElement.rowIndex;
+			var col = cell.getAttribute("id");
+			var targetBox = game.board.get(row,col);
+			var perimeter = targetBox.perimeter;
+			cell.setAttribute("bgColor", "");
+				for(var i = 0; i< perimeter.length; i++){
+					pRow = perimeter[i].row;
+					pCol = perimeter[i].col;
+					cell = boardTable.rows[pRow].cells[pCol];
+					cell.setAttribute("bgColor", "");
+				}
+		}		
 	}	
 
-	var game = new Game("Beginner");
+	btnStart.addEventListener("click", function(){
+		boardTable.innerHTML = "";
+		level = inputLevel.value;
+	    game = new Game(level);
+		inputMines.value = game.board.level.mines;
+	});
 	
-	for(var i = 0; i <= game.level.board.rows; i++){
-		for (var j = 0; j <= game.level.board.cols; j++) {
-			game.setValue(i,j);
-			value = game.boardElements[i][j];
-			boardTable.rows[i].cells[j].className = value == -1 ? "mine":""; 
-			//boardTable.rows[i].cells[j].innerHTML = value;
-		}
-	}
-
-	function clickEvent(col){
-		var content = game.boardElements[col.parentElement.id][col.id];
-		if(col.className != "flag"){
-			if(content == -1){
-				col.className = "boom";
-			}else /*if(col.className!= "safe")*/{
-				var row = parseInt(col.parentNode.rowIndex);
-				var j = parseInt(col.id);
-				
-				//game.other(row,j);
-				game.getSafesSquares(row,j);
-				//col.className = "safe";
-				// col.innerHTML = content ==  0 ? " " : content;
-			}
-		}
-	}
-
-	function rightClickEvent(col, ev){
-		ev.preventDefault();
-		if(col.className == "flag"){
-			col.className = "";
-		}else if(col.className != "safe"){
-			col.className = "flag";
-		}
-		return false;
-	}
 }

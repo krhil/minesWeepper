@@ -1,0 +1,44 @@
+
+table tr, td {
+	font-size: 11px;
+	border: solid black 1px;
+	color: #232aef; /*rgb(20,150,220);*/
+	font-weight: bold;
+	width: 30px;
+	height: 30px;
+	cursor: pointer;
+	text-align: center;
+	box-shadow: 1px 1px 1px gray;
+	border-collapse: collapse;
+}
+
+.over{
+	background-color: #ffad99;
+	color: red;
+	font-weight: bold;
+}
+.mine {
+	background-image: url('../images/mine2.png'); 
+	background-size:cover;
+	background-color: #ffad99;
+    width:20px;
+    height:20px;
+}
+.boom {
+	background-image: url('../images/boom5.png');
+	background-size:cover;
+    width:20px;
+    height:20px;
+}
+.safe{
+	text-align: center;
+	font-size: 12px;
+	font-weight: bold;
+	background-color: #a8f7ca; /*rgb(85,200,150);*/
+}
+.flag{
+	background-image: url('../images/flag2.png');
+	background-size:cover;
+    width:20px;
+    height:20px;
+}
