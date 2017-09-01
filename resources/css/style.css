@@ -3,6 +3,7 @@ table tr, td {
 	font-size: 11px;
 	border: solid black 1px;
 	color: #232aef; /*rgb(20,150,220);*/
+	background-color: #d9d9d9;
 	font-weight: bold;
 	width: 30px;
 	height: 30px;
@@ -13,14 +14,14 @@ table tr, td {
 }
 
 .over{
-	background-color: #ffad99;
+	background-color: #bfbfbf; /*#ffad99;*/
 	color: red;
 	font-weight: bold;
 }
 .mine {
 	background-image: url('../images/mine2.png'); 
 	background-size:cover;
-	background-color: #ffad99;
+	/*background-color: #ffad99;*/
     width:20px;
     height:20px;
 }
@@ -34,7 +35,7 @@ table tr, td {
 	text-align: center;
 	font-size: 12px;
 	font-weight: bold;
-	background-color: #a8f7ca; /*rgb(85,200,150);*/
+	background-color: #bfbfbf; /*#a8f7ca; rgb(85,200,150);*/
 }
 .flag{
 	background-image: url('../images/flag2.png');

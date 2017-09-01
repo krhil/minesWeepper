@@ -1,10 +1,12 @@
 window.onload = function(){
+
 	var boardTable  = document.getElementById("board");
 	var inputLevel  = document.getElementById("level");
 	var inputMines  = document.getElementById("mines");
 	var btnStart    = document.getElementById("btnStart");	
 
-	
+	var colorValues = {1:'#0066ff',2:'#009933',3:'#ff3300',4:'#002699',5:'#cc3300',6:'#ff6699',7:'#ffff00'};
+
 	Level = function(value){
 		switch(value) {
 			case "1":
@@ -133,7 +135,7 @@ window.onload = function(){
 	
 	Game = function(level){
 		this.board = new Board(level);
-		this.showHelp = false;	
+		this.showHelp = true;	
 		this.movesRemaining = this.getTotalSafBoxes();
 		this.activeMines = this.board.level.mines;
 		this.buildBoard();	
@@ -164,7 +166,7 @@ window.onload = function(){
 					setFlag(this);
 				},false);
 
-				cell.addEventListener("mouseover", function(){
+				cell.addEventListener("mousemove", function(){
 					scanPerimeter(this);
 				});
 				cell.addEventListener("mouseout", function(){
@@ -197,6 +199,7 @@ window.onload = function(){
 
 				cell = boardTable.rows[pRow].cells[pCol];
 				cell.innerHTML = perimeter[i].value >0 ? perimeter[i].value : "";
+				cell.style.color = colorValues[perimeter[i].value];
 				cell.className = "safe";
 				cell.setAttribute("disabled",true);
 				
@@ -223,10 +226,14 @@ window.onload = function(){
 
 				box.enable = false;
 				if(box.value != -1){
-					cell.className = "over"; 
-					cell.innerHTML = box.value > 0 ? box.value : "";
+					//if(cell.innerHTML===''){
+						cell.className = "over"; 
+						cell.innerHTML = box.value > 0 ? box.value : "";
+						cell.style.color = colorValues[box.value];
+					//}
 				}else{
-					cell.className = "mine";
+					if(cell.className!='flag')
+						cell.className = "mine";
 				}
 			}
 		}
@@ -264,7 +271,8 @@ window.onload = function(){
 				break;
 				default:
 					boxTarget.enable = false;
-					cell.className = "safe";			
+					cell.className = "safe";
+					cell.style.color = colorValues[boxTarget.value];			
 					cell.innerHTML = boxTarget.value;	
 					game.movesRemaining-=1;
 				break;
@@ -286,6 +294,7 @@ window.onload = function(){
 					if(boxTarget.value==-1){
 						game.activeMines-=1;
 						if(game.activeMines==0){
+							game.showAllBoxes();
 							alert("you win this time!");
 						}
 					}
