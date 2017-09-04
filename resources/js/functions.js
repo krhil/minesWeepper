@@ -4,8 +4,18 @@ window.onload = function(){
 	var inputLevel  = document.getElementById("level");
 	var inputMines  = document.getElementById("mines");
 	var btnStart    = document.getElementById("btnStart");	
+	var divMessage  = document.getElementById("divMessage");
+	var lblMessage  = document.getElementById("lblMessage");
 
-	var colorValues = {1:'#0066ff',2:'#009933',3:'#ff3300',4:'#002699',5:'#cc3300',6:'#ff6699',7:'#ffff00'};
+	var colorValues = {
+					    1:'#0066ff',
+					    2:'#009933',
+				   	    3:'#ff3300',
+					    4:'#002699',
+				   	    5:'#cc3300',
+					    6:'#ff6699',
+					    7:'#ffff00'
+					  };
 
 	Level = function(value){
 		switch(value) {
@@ -135,7 +145,7 @@ window.onload = function(){
 	
 	Game = function(level){
 		this.board = new Board(level);
-		this.showHelp = true;	
+		this.showHelp = false;	
 		this.movesRemaining = this.getTotalSafBoxes();
 		this.activeMines = this.board.level.mines;
 		this.buildBoard();	
@@ -143,7 +153,6 @@ window.onload = function(){
 	
 	Game.prototype.buildBoard = function(){
 		var boxes = this.board.getAll();
-		var showHelp = this.showHelp;
 
 		for(var i =0; i<boxes.length ; i++){
 			var row = boardTable.insertRow(i);
@@ -264,7 +273,7 @@ window.onload = function(){
 				case -1: 
 					game.showAllBoxes();
 					cell.className = "boom";
-					alert("Boom!!! You lose");
+					showMessage(2);
 				break;
 				case 0: 	
 					game.getSafeBoxes(row, col);
@@ -278,7 +287,7 @@ window.onload = function(){
 				break;
 			}
 			if(game.movesRemaining==0){
-				alert("you win this time!");
+				showMessage(1);
 			}
 		}
 	}
@@ -295,7 +304,7 @@ window.onload = function(){
 						game.activeMines-=1;
 						if(game.activeMines==0){
 							game.showAllBoxes();
-							alert("you win this time!");
+							showMessage(1);
 						}
 					}
 					if(minesRemaining>0){
@@ -348,11 +357,36 @@ window.onload = function(){
 		}		
 	}	
 
+	function showMessage(value){
+		switch (value)
+		{
+			case 1:
+				divMessage.className = "alert alert-success";
+				lblMessage.innerHTML = "you win this time!";
+				break;
+			case 2:
+				divMessage.className = "alert alert-danger";
+				lblMessage.innerHTML = "Boom!!!";
+				break;
+			default:
+				divMessage.className = "";
+				lblMessage.innerHTML = "";
+				break;			
+		}
+	}
+
 	btnStart.addEventListener("click", function(){
 		boardTable.innerHTML = "";
 		level = inputLevel.value;
 	    game = new Game(level);
+
+	    game.showHelp = false;
+	    if(!game.showHelp){
+	    	boardTable.style.backgroundColor = "#d9d9d9";
+	    }
+
 		inputMines.value = game.board.level.mines;
+		showMessage(0);
 	});
 	
 }
