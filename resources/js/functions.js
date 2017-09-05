@@ -2,6 +2,7 @@ window.onload = function(){
 
 	var boardTable  = document.getElementById("board");
 	var inputLevel  = document.getElementById("level");
+	var chkScan 	= document.getElementById("chkScan");
 	var inputMines  = document.getElementById("mines");
 	var btnStart    = document.getElementById("btnStart");	
 	var divMessage  = document.getElementById("divMessage");
@@ -235,11 +236,9 @@ window.onload = function(){
 
 				box.enable = false;
 				if(box.value != -1){
-					//if(cell.innerHTML===''){
 						cell.className = "over"; 
 						cell.innerHTML = box.value > 0 ? box.value : "";
 						cell.style.color = colorValues[box.value];
-					//}
 				}else{
 					if(cell.className!='flag')
 						cell.className = "mine";
@@ -258,8 +257,6 @@ window.onload = function(){
 		}
 	}
 
-	var game;
-	
 	function selectBox(cell){
 		var row = cell.parentElement.rowIndex;
 		var col = cell.getAttribute("id");
@@ -287,6 +284,7 @@ window.onload = function(){
 				break;
 			}
 			if(game.movesRemaining==0){
+				game.showAllBoxes();
 				showMessage(1);
 			}
 		}
@@ -380,7 +378,12 @@ window.onload = function(){
 		level = inputLevel.value;
 	    game = new Game(level);
 
-	    game.showHelp = false;
+	    chkScan.addEventListener("change", function(){
+			boardTable.style.backgroundColor = this.checked ? "" : "#d9d9d9";
+			game.showHelp = chkScan.checked;
+		})
+		game.showHelp = chkScan.checked;
+	   
 	    if(!game.showHelp){
 	    	boardTable.style.backgroundColor = "#d9d9d9";
 	    }
