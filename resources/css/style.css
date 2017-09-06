@@ -40,3 +40,11 @@ table tr, td {
     width:20px;
     height:20px;
 }
+.timer{
+	border: solid gray 2px; 
+	width: 80px !important; 
+	text-align: center !important; 
+	font-family: 'Concert One';
+	font-size: 14px;
+	margin: 10px 0 10px 0;
+}
