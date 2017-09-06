@@ -7,6 +7,7 @@
 	<link href="resources/images/shortcut.png" rel="shortcut icon">
 	<!-- Latest compiled and minified CSS -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link href='https://fonts.googleapis.com/css?family=Concert One' rel='stylesheet'>
 	<link href="resources/css/style.css" rel="stylesheet">
 </head>
 <body>
@@ -16,6 +17,7 @@
 			<div class="col-md-12">
 				<div class="col-md-2">
 					<div class="form-group">
+						
 						<label for="level">Level:</label>
 						<select id="level" class="form-control"'>
 							<option value="1">Beginner</option>
@@ -34,11 +36,11 @@
 						<input type="button" id="btnStart" class="btn btn-primary" value="Start!"/>
 					</div>
 				</div>
-
 				<div class="col-md-10">
 					<div id="divMessage">
 					  <label id="lblMessage"></label>
 					</div>
+					<div id="divTimer" class="timer">00:00:00</div>
 					<div class="row">
 						<div class="col-md-12">
 							<table id="board" readonly="true"></table>
@@ -51,6 +53,8 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="resources/js/easytimer.min.js"></script>
+<script src="resources/js/model.js"></script>
 <script src="resources/js/functions.js"></script>
 </body>
 </html>
