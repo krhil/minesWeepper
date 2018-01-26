@@ -5,6 +5,9 @@ window.onload = function(){
 	var inputMines  = document.getElementById("mines");
 	var btnStart    = document.getElementById("btnStart");	
 
+    var messages = {"WIN":{"content":"Fuck yeah! You win this time.","class":"alert alert-success"},
+    				"LOSE":{"content":"BOOM! You lose.","class":"alert alert-danger"}};
+
 	var colorValues = {1:'#0066ff',2:'#009933',3:'#ff3300',4:'#002699',5:'#cc3300',6:'#ff6699',7:'#ffff00'};
 
 	Level = function(value){
@@ -23,8 +26,8 @@ window.onload = function(){
 				break
 			case "3":
 				this.name = "Expert";
-				this.rows= 29;
-				this.cols= 15;
+				this.rows= 15;
+				this.cols= 29;
 				this.mines = 99;
 				break					
 		}
@@ -132,10 +135,10 @@ window.onload = function(){
 	Board.prototype.get = function(row, col){
 		return this.boxes[row][col];
 	}
-	
+
 	Game = function(level){
 		this.board = new Board(level);
-		this.showHelp = true;	
+		this.showHelp = false;	
 		this.movesRemaining = this.getTotalSafBoxes();
 		this.activeMines = this.board.level.mines;
 		this.buildBoard();	
@@ -148,11 +151,16 @@ window.onload = function(){
 		for(var i =0; i<boxes.length ; i++){
 			var row = boardTable.insertRow(i);
 			row.setAttribute("id",i);
+
 			for(var j =0; j<boxes[i].length ; j++){
 				var box = boxes[i][j];
 				var cell = row.insertCell(j);
 				cell.setAttribute("id",j);
-
+				if(this.showHelp){
+					row.style.backgroundColor = "";
+					cell.style.backgroundColor = "";
+					//cell.removeAttribute('backgroundColor');
+				}
 				//cell.innerHTML = box.value > 0 ? box.value:"" ;
 				/*if(box.value == -1){
 					cell.className = "mine";
@@ -223,7 +231,7 @@ window.onload = function(){
 			for(var j = 0; j < boxes[i].length; j++) {
 				var box = this.board.get(i,j);
 				var cell = boardTable.rows[i].cells[j];
-
+				
 				box.enable = false;
 				if(box.value != -1){
 					//if(cell.innerHTML===''){
@@ -233,7 +241,8 @@ window.onload = function(){
 					//}
 				}else{
 					if(cell.className!='flag')
-						cell.className = "mine";
+						cell.className = game.movesRemaining==0 ? "flag": "mine";
+					
 				}
 			}
 		}
@@ -249,7 +258,20 @@ window.onload = function(){
 		}
 	}
 
-	var game;
+	Game.prototype.disableAllBoxes = function(){
+		var boxes = this.board.getAll();
+		
+		for(var i = 0; i < boxes.length; i++) {
+			for(var j = 0; j < boxes[i].length; j++) {
+				var box = this.board.get(i,j);
+				var cell = boardTable.rows[i].cells[j];
+				box.enable = false;
+				cell.setAttribute("disabled",true);
+			}
+		}			
+	}
+
+	//var game;
 	
 	function selectBox(cell){
 		var row = cell.parentElement.rowIndex;
@@ -262,9 +284,10 @@ window.onload = function(){
 		if(boxTarget.enable){
 			switch(boxTarget.value){
 				case -1: 
-					game.showAllBoxes();
+					game.showAllMines(); //.showAllBoxes();
+					game.disableAllBoxes();
 					cell.className = "boom";
-					alert("Boom!!! You lose");
+					showMessage(messages.LOSE);
 				break;
 				case 0: 	
 					game.getSafeBoxes(row, col);
@@ -278,7 +301,8 @@ window.onload = function(){
 				break;
 			}
 			if(game.movesRemaining==0){
-				alert("you win this time!");
+				showMessage(messages.WIN);
+				game.showAllBoxes();
 			}
 		}
 	}
@@ -295,7 +319,7 @@ window.onload = function(){
 						game.activeMines-=1;
 						if(game.activeMines==0){
 							game.showAllBoxes();
-							alert("you win this time!");
+							showMessage(messages.WIN);
 						}
 					}
 					if(minesRemaining>0){
@@ -319,7 +343,7 @@ window.onload = function(){
 			var col = cell.getAttribute("id");
 			var targetBox = game.board.get(row,col);
 			var perimeter = targetBox.perimeter;
-			var color = targetBox.value == -1 ? "#ffcccc" : "#b1c9ef";
+			var color =  targetBox.value == -1 ? "#ffcccc" : "#b1c9ef";
 			cell.setAttribute("bgcolor",color);
 
 				for(var i = 0; i< perimeter.length; i++){
@@ -353,6 +377,18 @@ window.onload = function(){
 		level = inputLevel.value;
 	    game = new Game(level);
 		inputMines.value = game.board.level.mines;
+		$('#modalGame').modal('hide');
 	});
+
+	$("#btnPlay").click(function(){
+		$('#modalGame').modal('hide');
+	})
+
+	function showMessage(message){
+		document.getElementById('messageModal').innerHTML = message.content;
+		document.getElementById('divMessage').className =message.class;
+		$('#modalMessage').modal('show');
+
+	};
 	
 }
